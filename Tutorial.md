@@ -28,8 +28,6 @@ There are five data types that are most often used in R analysis. These are eith
 | nD    | Array         |              |
 
 ``` str([object]) ``` will tell you an object's type.
-```
-ER: remove line above
 
 ### Vectors
 Vectors are the basic data type in R. There are two types of vectors: those that require all elements to be of the same type (atomic vectors) and those that can hold multiple types (lists).
@@ -88,8 +86,7 @@ x <- list("abc", c(F, F, T), 0:5)
 ```
 
 ```c()``` will combine a passed combination of vectors and lists into a single list.
-```
-ER: remove line above
+
 Similar to atomic vectors, ```is.list()``` tests if an object's type and ```as.list()``` coerces it.
 
 Lists are a frequent building block of more complicated structures in R (e.g., data frames and linear models).
@@ -110,8 +107,7 @@ dim(z) <- c(2,2)
 ```
 
 ```rownames()``` and ```colnames()``` allow you to name rows and columns using vectors of strings.
-```
-ER: remove line above
+
 ###### Testing
 ```length()``` gives the number of cells in an array. ```nrow()```, and ```ncol()``` give the row and columns counts respectively.
 
@@ -120,8 +116,7 @@ ER: remove line above
 
 ###### Coercion
 ```as.matrix()``` and ```as.array()``` turn a vector or list into a matrix or array. It's most common to see vectors coerced.
-```
-ER: remove line above
+
 Note you can have single dimension matricies or arrays that print similarly to vectors but behave differently.
 
 ### Data Frames

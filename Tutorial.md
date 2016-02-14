@@ -9,14 +9,6 @@ I want to learn R because of its broad popularity and deeper extensibility, so I
 
 I assume the user has already installed R and is using the IDE [RStudio](https://www.rstudio.com/).
 
-Code block example:
-```{r}
-
-a <- c(1,2,3,4)
-a  # returns values of vector a
-```
-
-
 ## 1. Fundamentals
 ## Data structures
 There are five data types that are most often used in R analysis. These are either used directly or are the foundations upon which other objects are built. They differ in their dimensionality and whether or not all of their contents must be of the same type (e.g., homogenous vs. heterogeneous).
@@ -59,8 +51,7 @@ Note assignment is done with ```<-``` and not ```=```. The latter will often wor
 Missing values are specified with the logical vector ```NA``` which will be coerced to the appropriate type if used inside a vector of a different type.
 
 ###### Testing
-```is.character()```, ```is.double()```, ```is.integer()```, and ```is.logical()``` allow you to test the vectors.
-```
+Functions ```is.character()```, ```is.double()```, ```is.integer()```, and ```is.logical()``` allow you to test the vectors.
 
 Note that both doubles and integers return true for ```is.numeric()```.
 
@@ -69,7 +60,7 @@ R has a natural order of least to most flexible types of atomic vectors. If you 
 
 For example:
 ```{r}
-male <- c(T, F, T, T, F)
+male <- c(T, F, T, T,  F)
 
 mean(male)
 #> [1] 0.6
@@ -85,7 +76,9 @@ x <- list("abc", c(F, F, T), 0:5)
 # creates a list of three vectors, each of a different type of attributes
 ```
 
-```c()``` will combine a passed combination of vectors and lists into a single list.
+A ```c()``` will combine a passed combination of vectors and lists into a single list.
+
+###### Testing and coercion
 
 Similar to atomic vectors, ```is.list()``` tests if an object's type and ```as.list()``` coerces it.
 
@@ -106,16 +99,16 @@ z <- 1:4
 dim(z) <- c(2,2)
 ```
 
-```rownames()``` and ```colnames()``` allow you to name rows and columns using vectors of strings.
+Functions ```rownames()``` and ```colnames()``` allow you to name rows and columns using vectors of strings.
 
 ###### Testing
-```length()``` gives the number of cells in an array. ```nrow()```, and ```ncol()``` give the row and columns counts respectively.
+The number of cells in an array can be found with ```length()```. ```nrow()```, and ```ncol()``` give the row and columns counts respectively.
 
-```is.matrix()``` and ```is.array()``` test the type of the object.
+Object's type can be tested with ```is.matrix()``` and ```is.array()```.
 
 
 ###### Coercion
-```as.matrix()``` and ```as.array()``` turn a vector or list into a matrix or array. It's most common to see vectors coerced.
+Using ```as.matrix()``` and ```as.array()``` turn a vector or list into a matrix or array. It's most common to see vectors coerced.
 
 Note you can have single dimension matricies or arrays that print similarly to vectors but behave differently.
 
@@ -133,8 +126,8 @@ dataframe <- data.frame(
 A data frame is recognized as a list based on it's ```typeof()```, bot as a ```data.frame``` based on it's ```class```. It can also be identified with ```is.data.frame```.
 
 ###### Coercion
-```as.data.frame()``` coerces objects into a data frame. A vector becomes a one column data frame. A list must have elements of equivalent length as they'll each be turned into a var.
+Vectors and lists can be coerced into data frames with ```as.data.frame()```. A vector becomes a one column data frame. A list must have elements of equivalent length as they'll each be turned into a var.
 
-```cbind()``` and ```rbind()``` combine data frames column wise and row wise. In the former, the number of rows must match. In the later the number and name of columns must match.
+Data frames can be combined across either dimension. ```cbind()``` and ```rbind()``` combine data frames column wise and row wise. In the former, the number of rows must match. In the later the number and name of columns must match.
 
 See ```plyr::rbind.fill()``` to combine data frames that don't have the same columns.

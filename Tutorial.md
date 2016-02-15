@@ -1,4 +1,4 @@
-# High Performance R
+# High Performance Data Slicing in R
 
 #### Motivation
 I spent several years exploring and building models of empirical consumer behavior data alongside economists and statisticians. Most of this work was in the statistical analysis software [Stata](http://www.stata.com/).
@@ -19,7 +19,7 @@ There are five data types that are most often used in R analysis. These are eith
 | 2D    | Matrix        | Data Frame   |
 | nD    | Array         |              |
 
-``` str([object]) ``` will tell you an object's type.
+You can check an object's type with ``` str([object]) ```.
 
 ### Vectors
 Vectors are the basic data type in R. There are two types of vectors: those that require all elements to be of the same type (atomic vectors) and those that can hold multiple types (lists).
@@ -85,7 +85,7 @@ Similar to atomic vectors, ```is.list()``` tests if an object's type and ```as.l
 Lists are a frequent building block of more complicated structures in R (e.g., data frames and linear models).
 
 ### Matricies and Arrays
-A matrix in R is an two dimensional atomic vector. Arrays of higher dimensions are possible, though used much less frequently. Dimensions are defined in the ```dim()``` attribute.
+A matrix in R is an two dimensional atomic vector. Arrays of higher dimensions are possible, though used much less frequently. Dimensions are defined in the ```dim()``` attribute. Matricies and arrays in R are stored in [column-major order](https://en.wikipedia.org/wiki/Row-major_order#Column-major_order).
 
 ```{r}
 # Define a 5x2 matrix with 1-5 in first column and 6-10 in second
@@ -131,3 +131,90 @@ Vectors and lists can be coerced into data frames with ```as.data.frame()```. A 
 Data frames can be combined across either dimension. ```cbind()``` and ```rbind()``` combine data frames column wise and row wise. In the former, the number of rows must match. In the later the number and name of columns must match.
 
 See ```plyr::rbind.fill()``` to combine data frames that don't have the same columns.
+
+## Subsetting
+Subsetting data well is necessary for efficient and effective R code. Unfortunately, it's also a difficult task because it involves a number of interrelated concepts. Here we'll introduce some foundational concepts and start to build intuition for mastering subsetting.
+
+### Data Types
+There are three subsetting operators in R: ```[]```, ```[[]]```, and ```$```. The first, square brackets is the most common. We'll look at these in practice starting from interactions with simple data types and moving to more complex, multidimensional types.
+
+#### Atomic Vectors
+Below are several examples of subsetting a vector:
+```{r}
+x <- c(-3, -2, -1, 0, 1, 2, 3)
+
+# Passing a vector through [] request by index
+x[c(4, 1)]
+#> [1] 0 -3
+
+# Order(x) returns the index permutation of smallest to largest ordered values
+x[order(x)]
+#> [1] -3 -2 -1 0 1 2 3
+
+# Non-ints are truncated to ints before subsetting
+x[c(1.4, 2.3)]
+#> -3 -2
+
+# Negative numbers return the complimentary set
+x[-c(2)]
+#> [1] -3 -1 0 1 2 3
+# Note you can't mix positive and negative indicies
+
+# Passing nothing returns the entire set
+x[]
+#> [1] -3 -2 -1 0 1 2 3
+
+# Logical operators
+# If the logical vector is shorter than the vector to be subset, it's repeated
+x[c(TRUE, FALSE)]
+#> [1] -3 -1 1 3
+
+# A missing value in an index always returns an NA in the output
+
+# If a vector is named, index names can be used to subset as well
+
+```
+
+#### Lists
+Lists are subset the same way with ```[]```. ```[[]]``` and ```$``` as shown below allow you to extract the components of a list.
+
+#### Matricies and Arrays
+Two and higher dimension objects can be subset in three ways:
++ Single vector
++ Multiple vectors
++ Matrix
+
+The most common method is submitting an index for each dimension, separated by a comma.
+```{r}
+X <- matrix(1:12, nrow=4, ncol=3)
+X
+#> [,1] [,2] [,3]
+#> [1,]    1    5    9
+#> [2,]    2    6   10
+#> [3,]    3    7   11
+#> [4,]    4    8   12
+
+X[1, 1:4]
+#> [1] 1 5 9
+
+X[c(1, 5)]
+#> 1 5
+```
+
+#### Data Frames
+Within a dataframe ```$``` can be used to select specific columns by name
+
+```{r}
+data <- data.frame(v1 = 1:3, v2 = 0, v3 = letters[1:3])
+data
+#> v1 v2 v3
+#> 1  1  0  a
+#> 2  2  0  b
+#> 3  3  0  c
+
+data$v1
+#> 1 2 3
+
+
+
+```

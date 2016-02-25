@@ -264,3 +264,43 @@ x
 ```
 
 ## Style Guide
+First, it's worth mentioning the Google has a very good [R Style Guide](https://google.github.io/styleguide/Rguide.xml). I generally agree with their suggestions, but have added a few points of emphasis.
+
+### Naming
+#### File Names
+File names should, of course, be descriptive of what the actual file does. The should also end in ```.R```.
+For example: ```predict_user_engagement.R```
+
+#### Variable Names
+Identifiers should either be (a) all lowercase with words separated by dots (```delta.sales```), or (b) camel case (```deltaSales```).
+
+#### Function Names
+The first word of a function name should be a verb. They should also begin with a capital letter with words separated by camel case (```CalibrateBetaBinomial```). Note there shouldn't be any punctuation.
+
+#### Constants
+Constants should be named like functions, but begin with a ```k``` (```kDiscountRate```).
+
+### Spacing
+Indent with two spaces, never tabs.
+
+Use spaces around operators (```+, -, >, <-,``` etc.) and parentheses, except in function calls.
+
+### Braces
+An opening curly brace should never go on its own line. A closing curly brace should always be on its own line.
+
+Surround ```else``` statements with curly braces.
+```{r}
+if (condition) {
+  one or more lines
+} else {
+  one or more lines
+}
+```
+
+### Commenting
+Use a consistent ```TODO``` comment system (```TODO(username)```).
+
+Visually break up your code using commented lines of ```-```.
+```{r}
+# Load data --------------
+```

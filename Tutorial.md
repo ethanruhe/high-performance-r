@@ -9,6 +9,9 @@ I want to learn R because of its broad popularity and deeper extensibility, so I
 
 I assume the user has already installed R and is using the IDE [RStudio](https://www.rstudio.com/).
 
+#### Note on Data
+To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the data structures examples. Specifically, I'll be looking at the US Department of Education's College Scorecard data as I go through the tutorial. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
+
 ## 1. Fundamentals
 ## Data structures
 There are five data types that are most often used in R analysis. These are either used directly or are the foundations upon which other objects are built. They differ in their dimensionality and whether or not all of their contents must be of the same type (e.g., homogenous vs. heterogeneous).
@@ -202,19 +205,62 @@ X[c(1, 5)]
 ```
 
 #### Data Frames
-Within a dataframe ```$``` can be used to select specific columns by name
+Subsetting a single vector (variable) in data frame behaves like a list. Subsetting multiple vectors behaves like a matrix.
 
 ```{r}
 data <- data.frame(v1 = 1:3, v2 = 0, v3 = letters[1:3])
 data
-#> v1 v2 v3
+#>   v1 v2 v3
 #> 1  1  0  a
 #> 2  2  0  b
 #> 3  3  0  c
 
+# $ subsets a single vector, which returns as a list
 data$v1
-#> 1 2 3
+#> [1] 1 2 3
 
+# Select a row using matrix notation
+data[data$v1 == 1, ]
+#>   v1 v2 v3
+#> 1  1  0  a
 
+# Select columns like a list; note the result is a dataframe
+data[c("v1", "v2")]
+#>   v1 v2
+#> 1  1  0
+#> 2  2  0
+#> 3  3  0
+
+# Select columns like a matrix; note the result is not a dataframe
+data[, c("v1", "v2")]
+#>   v1 v2
+#> 1  1  0
+#> 2  2  0
+#> 3  3  0
 
 ```
+### Subsetting Operators
+#### Simplifying vs. preserving subsetting
+Some types of subsetting simplify the output to the most basic type possible, while others preserve the format of the original object. It's important to understand the difference in what you're asking R for.
+
+
+|           | Simplifying      |	Preserving                          |
+|:---------:|:----------------:|:------------------------------------:|
+|Vector     | x[[1]]	         | x[1]                                 |
+|List	      | x[[1]]	         | x[1]                                 |
+|Factor     | x[1:4, drop = T] | x[1:4]                               |
+|Array      | x[1, ] or x[, 1] | x[1, , drop = F] or x[, 1, drop = F] |
+|Data frame	| x[, 1] or x[[1]] | x[, 1, drop = F] or x[1]             |
+
+#### Subsetting with assignment
+Subsetting operators can be used modify selected values of a vector.
+
+```{r}
+x <- 0:9
+x[c(1, 2, 3)] <- 10:12
+
+x
+#> [1] 10 11 12  3  4  5  6  7  8  9
+```
+
+## Style Guide

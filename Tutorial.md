@@ -455,3 +455,39 @@ IsEven <- function(x) {
 Functions are only able to return one object, so if you want multiple values back, you'll have to pass them through a vector/list/array/etc.
 
 It is also worth being aware that other than return values, functions generally have no other side effects. That is, they won't modify anything outside their scope. There are a few exceptions to this, but these are functions whose sole purpose is to modify the environment (e.g., ```setwd()```) or do something like write to disk (e.g., ```save.csv()```).
+
+## Environments
+### Overview
+Environments are where __bindings__ (links between names and values) are stored. Each name points to a value stored somewhere in memory (e.g., a physical byte address). The addresses are associated with names, so that when you invoke an object, R knows where to go retrieve its value. Environments are data structures that organize scoping and bindings.
+
+Within R, multiple names can point to the same value (by memory address). Multiple names can also point to different addresses that all store the same value.
+
+If there are no names pointing to an object, it is automatically deleted. That is the memory that was holding it is freed to store new information. The underlying mechanism that drives this is called a "garbage collector." See ```?gc()``` for more information on interacting with this behavior.
+
+Every environment has a parent. As mentioned in the lexical scoping section, if an R object is not found in an environment, R looks to the parent directory. This search only moves "up" to parent directories. There is no built in way to search "child" directories, and, furthermore, defining which of an arbitrary number of child directories to search wouldn't be straightforward.
+
+There are some basic rules of environments:
++ Each object has a unique name *within* an environment (though the [namespace](https://en.wikipedia.org/wiki/Namespace) allows a name to be used once per environment)
++ Each environment has a parent, with exactly one exception: the empty environment
++ Actual memory location is arbitrary; there is no inherent "order" (you can touch the memory handling directly through C, but that's beyond the scope of this tutorial)
+
+Each environment has two fundamental components:
++ The frame: contains bindings for names and objects
++ The parent environment: confusingly, this can sometimes refer to either the true parent or the "calling" environment as we saw in the Function section
+
+There are four special types of environments:
++ The global environment, ```globalenv()```, is what you normally work and interact with in R. The parent is the most recently loaded ```library()``` or ```require()```
++ The empty environment, ```emptyenv()```, is the highest-level parent and the only env without a parent itself
++ The base environment, ```baseenv()```, is the parent to the empty environment
++ The current environment, ```environment()```
+
+The command ```search()``` lists the search path (e.g., all parents) of the global environment. Any of these environment can be accessed environment with ```as.environment()```. ```new.env()``` will create a new environment.
+
+### Function Environments
+Using functions creates new environments.
+
+Specifically, there are four types of environments associated with functions:
++ enclosing: where the function was defined. Each function has only one enclosing environment
++ binding: associates the contents of a function with a name via ```<-```
++ execution: the environment that exists only while a function is being evaluated (and is then destroyed)
++ calling: the environment from which a function was invoked

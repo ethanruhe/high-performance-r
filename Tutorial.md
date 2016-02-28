@@ -304,3 +304,154 @@ Visually break up your code using commented lines of ```-```.
 ```{r}
 # Load data --------------
 ```
+
+## Functions
+Functions allow you to write reusable code to be applied in a potentially flexible way on a variety of inputs. Functions are a key building block of R. Importantly, they are objects themselves and can be treated as such.
+
+To explore functions, we'll use the package ```pryr```. ```install.packages("pryr")``` if you don't already have it.
+
+There are three parts to each R function:
++ ```body()``` - the code inside the function that gets executed when the function is called
++ ```formals()``` - the arguments of the function
++ ```environment()``` - the locational map of the function's vars (default is global)
+
+Each of the above commands can be used to decompose the stated parts of a function.
+
+Recall all R objects, including functions, have ```attributes()``` as well. ```str()``` will identify a function and list its attributes in human-readable text. ```is.function()``` will identify functions with a Boolean
+
+### Primitive functions
+Primitive functions are an exception to the rules in R. They rely directly on C code and contain no R code. Therefore, they do not contain the three components noted above. They often provide fundamental computation very efficiently (e.g., ```sum()``` is a primitive that adds). They can be identified with ```is.primitive()```.
+
+### Lexical Scoping
+[Scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)) is the set of rules that govern how a computer program looks up entities, such as variables, when they're referenced in code.
+
+Note: when using R's command line interactively, it uses "dynamic scoping." This has it's own rules and issues, but we won't cover them here because the topic is outside the... scope of this tutorial.
+
+With lexical scoping, availability and access to entities by name is determined by where they are created relative to other entities.
+
+To steal from the Wiki example of a different programing language:
+```
+program A;
+var I:integer;
+    K:char;
+
+    procedure B;
+    var K:real;
+        L:integer;
+
+        procedure C;
+        var M:real;
+        begin
+         (*scope A+B+C*)
+        end;
+
+     (*scope A+B*)
+    end;
+
+ (*scope A*)
+end.
+```
+
+Note that the scoping seems hierarchical and vars are only *available* where they are defined or in some sub-part of where they are defined. For example, a var defined in the global environment, the highest level, is available everywhere. But a variable defined within a function is only available to access from inside that function. When looking for the associated value of a named entity, the program will start locally (i.e., the narrowest scope) and keep moving higher until if finds an entity matching that name. This can also be thought of as the effective "order of priority" if there are multiple entities with the same name in a program.
+
+R looks for values when a function is run, not when it is created. Because of this, if a function relies on a variable outside of its scope (e.g., a global variable), then the result of the function can change as that outside variable changes. This can be dangerous; functions should be self-contained and only be variable depending on values passed as arguments. ```findGlobals()``` identifies global dependencies of a function.
+
+One exception to strict lexical scoping in R is that the program will ignore non-function objects with a shared name if the object being called is clearly a function.
+
+The function ```exists()``` can be helpful for debugging or building a better intuition about how R is handling scoping.
+
+#### Every Operation is a Function Call
+Every operation is a function call in R. This includes things like ```+```, ```(```, and ```if```. Back ticks, ``` \` ```, allow you to override functions with otherwise protected names (e.g., ```+```), but this is obviously very dangerous.
+
+### Function Arguments
+#### Calling Functions
+Arguments passed with a function, sometimes called "calling arguments," can vary each time you call the function and alter the output depending on chosen parameters.
+
+There are three ways to pass arguments with a function:
++ by position
++ by complete name
++ by partial name
+
+```{r}
+ExFunction <- function(arg1, arg2, color) {
+  list(x = arg1, y = arg2, color = color)
+}
+
+# By position
+ExFunction(1, 2, "blue")
+#> $x
+#> [1] 1
+#>
+#> $y
+#> [1] 2
+#>
+#> $color
+#> [1] "blue"
+
+# By name
+ExFunction(arg2 = 2, color = "red", arg1 = 1)
+#> $x
+#> [1] 1
+#>
+#> $y
+#> [1] 2
+#>
+#> $color
+#> [1] "red"
+
+# By position and partial name
+ExFunction(1, c = "green", arg2 = 2)
+#> $x
+#> [1] 1
+#>
+#> $y
+#> [1] 2
+#>
+#> $color
+#> [1] "green"
+# Note the function will return an error if an argument name is given an ambiguous abbreviation (e.g., "arg" in the example above.)
+
+```
+
+As rules of thumb: positional arguments should only be used for the first one or two variables, and open ended lists of arguments passed with ```...``` should be at the end of the argument list.
+
+The ```...``` operator is used to pass an arbitrary number of not explicitly named arguments.
+
+#### Default and Missing Arguments
+ When defining functions, arguments can be given default values that are used unless other values are passed when the function is used.
+
+ ```{r}
+ExFunction <- function(x = 1, y = 2) {
+  c(x, y)
+}
+
+z <- ExFunction()
+z
+#> [1] 1 2
+
+ ```
+
+The ```missing()``` function allows you to test for missing arguments within a function definition. If a default value would take several lines of code, ```missing()``` can allow you to take the missing value equation out of the function's argument definition line.
+
+#### Lazy Evaluation
+R uses so called "lazy evaluation" of functions, which means that arguments are only evaluated if they're actually used.
+
+Using ```force()``` on the variable name within the function definition will ensure that they argument is evaluated (e.g., this could ensure an error is thrown for an argument that otherwise wouldn't be evaluated).
+
+#### Return Values
+A return value is what results from a function. By default in R, the last evaluated line of a function definition is what is returned. ```return()``` can explicitly define a return value as well. It's good practice to define an explicit return if a function could be finished evaluating before the last written line of code.
+
+```{r}
+IsEven <- function(x) {
+  if (x %% 2 == 0) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+
+```
+
+Functions are only able to return one object, so if you want multiple values back, you'll have to pass them through a vector/list/array/etc.
+
+It is also worth being aware that other than return values, functions generally have no other side effects. That is, they won't modify anything outside their scope. There are a few exceptions to this, but these are functions whose sole purpose is to modify the environment (e.g., ```setwd()```) or do something like write to disk (e.g., ```save.csv()```).

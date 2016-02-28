@@ -491,3 +491,45 @@ Specifically, there are four types of environments associated with functions:
 + binding: associates the contents of a function with a name via ```<-```
 + execution: the environment that exists only while a function is being evaluated (and is then destroyed)
 + calling: the environment from which a function was invoked
+
+## Debugging
+No matter how advanced of an R coder you become, much of your time is going to be spent investigating and fixing unanticipated errors. This section will give a high-level foundation of how to quickly troubleshoot bugs in your code. Additionally, it will highlight a few tools for communicating expected problems to a user.
+
+### Condition Handling
+Exceptions are communicated according to severity in through three functions:
++ Fatal errors, raised through ```stop()```, terminate execution
++ Warnings, raised through ```warning()```, tell the user about potent problems
++ Messages, raised through ```message()```, give the user additional information. These can be ignored by the user with ```suppressMessages()```
+
+There are three functions that allow you to handle conditions:
++ ```try()``` continues execution even if an error is thrown
++ ```tryCatch()``` allows you to define a handler function
++ ```withCallingHandlers()``` is less-used variant of ```tryCatch()```
+
+### Debugging Strategies
+Hadely Wicham gives the following helpful four step approach to debugging:
+1. Realise that you have a bug: this, he suggests, is one of the reasons automated testing is so important
+2. Make it repeatable: isolating exactly what is causing the bug is necessary to hone in on what is failing, so you don't spend time deep diving into superfluous code
+3. Figure out where it is: generate hypotheses, design experiments, test them, and record your results. Being systematic here will save you time in the long run
+4. Fix it and test it: once you've addressed the problem, test to make sure it is actually gone!
+
+Printing intermediate output, ```print()```, is an easy, if crude, tool for troubleshooting code. Print statements allow you to track intermediate output and, therefore, see where execution diverges from what you expect
+
+RStudio also has useful debugging tools built in:
++ When a function call returns a fatal error, options for "Show Traceback" and "Rerun with Debug" appear on the output window
+..+ ```traceback()``` gives the same output as the button: the order of functions called that led to the error
+..+ the RStudio debugger steps through the function's execution line-by-line, pausing in the execution environment so that you can interact with it along the way
++ Breakpoints and browsing allow you to arbitrarily pause execution and stay in the executing environment anywhere in your code
+..+ Breakpoints can be added by clicking left of the line number in RStudio, or with ```Shift + F9```
+..+ ```browse()``` statements can be included anywhere in your code for the same effect; note these support conditional statements where breakpoints do not
+
+For more on debugging in R Studio, see the [documentation](https://support.rstudio.com/hc/en-us/articles/205612627-Debugging-with-RStudio).
+
+### Defensive Programming
+[Defensive programming](https://en.wikipedia.org/wiki/Defensive_programming) is the principle that code should be designed and written in a way that exceptions are anticipated to a reasonable degree and conditions are thrown as soon as any one thing goes astray.
+
+In practice, this means keeping in mind common mistakes you or other programmers make and trying to (a) programmatically avoid them or (b) at least make the user aware that they are occurring.
+
+A good way to do this is through tests that verify inputs to functions are as expected and output is structured as anticipated.
+
+The [assertthat](https://github.com/hadley/assertthat) package, ```stop()```, ```stopifnot()```, and simple ```if``` statements are a great place to start.

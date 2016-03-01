@@ -1,4 +1,3 @@
-# High Performance Data Slicing in R
 
 #### Motivation
 I spent several years exploring and building models of empirical consumer behavior data alongside economists and statisticians. Most of this work was in the statistical analysis software [Stata](http://www.stata.com/).
@@ -12,7 +11,7 @@ I assume the user has already installed R and is using the IDE [RStudio](https:/
 #### Note on Data
 To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the data structures examples. Specifically, I'll be looking at the US Department of Education's College Scorecard data as I go through the tutorial. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
 
-## 1. Fundamentals
+# 1. Fundamentals
 ## Data structures
 There are five data types that are most often used in R analysis. These are either used directly or are the foundations upon which other objects are built. They differ in their dimensionality and whether or not all of their contents must be of the same type (e.g., homogenous vs. heterogeneous).
 
@@ -533,3 +532,57 @@ In practice, this means keeping in mind common mistakes you or other programmers
 A good way to do this is through tests that verify inputs to functions are as expected and output is structured as anticipated.
 
 The [assertthat](https://github.com/hadley/assertthat) package, ```stop()```, ```stopifnot()```, and simple ```if``` statements are a great place to start.
+
+
+# Functional Programming
+## Introduction
+### Overview and Motivation
+R is a [functional programming](https://en.wikipedia.org/wiki/Functional_programming) language. It allows you to treat functions just like any other object: bind them to names, create lists of them, pass them as arguments in other functions, use them to create other functions (i.e., return them as the result of other functions) etc. The fact that functions are treated like any other data variables means they are [first class functions](https://en.wikipedia.org/wiki/First-class_function).
+
+At a high-level, functional programming is motivated by starting with simple, "primitives," and using these building blocks to create more complex functions. This allows you to concisely define any functionality only once. In R, the building blocks are anonymous functions, closures, and lists of functions. These are discussed in more depth below.
+
+R's ```lapply()``` function is a good example of a function with functional programming in mind. It takes two arguments, (1) a list and (2) a function, plus any arguments that have to be passed to (2). The function in (2) is applied to each element of the list in (2). A new list of the resulting values is returned. The ```lapply()``` allows you to combine the use of any arbitrary input function with the ability to apply it quickly to a queue of inputs. This is the essence of combining useful primitives: "do this to each item of a list" can be disassociated with any particular "doing" to those items.
+
+## Basic Building Blocks
+### Anonymous Functions
+If you don't give an R function a name, you get an anonymous function. These are often useful when it isn't necessary to create a named function that will be used repeated throughout your code. (These are analogous to Python's [lambda functions](https://stackoverflow.com/questions/890128/why-are-python-lambdas-useful)). Since these are actual R functions, they have a ```body()```, a parent ```environment()```, and ```formals()``` as the proceeding sections suggested they would.
+
+Note that calling an anonymous function requires an extra set of parentheses to clearly indicate what exactly you're calling. For example:
+
+### Closures
+Closures are functions written (returned by) other functions. Their names reference the fact that they're created by a parent function that encloses their environment. Note that by definition closures have access to all of their parent function's variables.
+
+[[example here]]
+
+Unfortunately, printing a closure give the memory address of the enclosing function and not the actual definition (with specified parameters) of itself. This is because the parent function itself isn't actually changing, it just has values passed. You can see this by converting the environment of the closure into a list.
+
+[[example]]
+
+As noted earlier, execution environments are forgotten after execution. Functions, however, capture their enclosing environments. This is what allows closures to work. Functionally, it turns out that most R functions are actually closures and thus remember the environment in which they were created. The only exception are primitive functions that are written in C.
+
+### Lists of Functions
+This is pretty straightforward: you can put function definitions in the elements of a list. The structure is easy to understand, but the power of this may be a bit counterintuitive. Let's look at an example:
+
+```{r}
+# Benchmarking the processing time of various implementations of a function
+compute_sum <- list(
+  base = function(x) sum(x),
+  manual = function(x){
+    total = 0
+    for (i in seq_along(x)) {
+      total <- total + x[i]
+    }
+    total
+  }
+)
+
+# To run, just extract from list and run
+y <- runif(1e7) # create ten million reals w/ mean = 0.5; sum ~5e6
+
+system.time(compute_sum$base(y))
+system.time(compute_sum[[2]](y))
+
+# Run each and see if we get the same answer
+lapply(compute_sum, function(f) f(y))
+
+```

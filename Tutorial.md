@@ -585,4 +585,7 @@ system.time(compute_sum[[2]](y))
 # Run each and see if we get the same answer
 lapply(compute_sum, function(f) f(y))
 
+# Time each function with one line
+lapply(compute_sum, function(f) system.time(f(y)))
+
 ```

@@ -9,7 +9,7 @@ I want to learn R because of its broad popularity and deeper extensibility, so I
 I assume the user has already installed R and is using the IDE [RStudio](https://www.rstudio.com/).
 
 #### Note on Data
-To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the data structures examples. Specifically, I'll be looking at the US Department of Education's College Scorecard data as I go through the tutorial. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
+To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the brief tutorial. Specifically, I'll be looking at the US Department of Education's College Scorecard data. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
 
 # 1. Fundamentals
 ## Data structures
@@ -21,7 +21,7 @@ There are five data types that are most often used in R analysis. These are eith
 | 2D    | Matrix        | Data Frame   |
 | nD    | Array         |              |
 
-You can check an object's type with ``` str([object]) ```.
+You can check an object's type with ``` str() ```.
 
 ### Vectors
 Vectors are the basic data type in R. There are two types of vectors: those that require all elements to be of the same type (atomic vectors) and those that can hold multiple types (lists).
@@ -33,7 +33,7 @@ Both have a few key properties:
 + ```is.atomic()``` and ```is.list()``` return true if passed the expected object
 
 #### Atomic Vectors
-There are four common data types atomic vectors:
+There are four common data types that can be held in atomic vectors:
 ```{r}
 # Doubles are non-int numerics
 double_atomic <- c(10.0, 2, 1)
@@ -48,7 +48,7 @@ logical_atomic <- (TRUE, T, FALSE, F)
 # Characters
 char_atomic <- c("a", "c")
 ```
-Note assignment is done with ```<-``` and not ```=```. The latter will often work, but the reasons why it breaks can often be complicated rules related to compatibility with old versions of S, scope differences in the declaration, or parsing rules. [Here's some short intuition](https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and).
+Note assignment is done with ```<-``` and not ```=```. The latter will often work, but the reasons why it breaks can be complicated rules related to compatibility with old versions of S, scope differences in the declaration, or parsing rules. [Here's some short intuition](https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and). To avoid this, it's not a bad idea to default to ```<-``` unless you have a good reason to use ```=```.
 
 Missing values are specified with the logical vector ```NA``` which will be coerced to the appropriate type if used inside a vector of a different type.
 
@@ -67,7 +67,7 @@ male <- c(T, F, T, T,  F)
 mean(male)
 #> [1] 0.6
 ```
-Most R math functions will attempt to coerce automatically. Use ```as.character()```, ```as.double()```, ```as.integer()```, or ```as.logical``` to explicitly coerce values
+Most R math functions will attempt to coerce automatically. Use ```as.character()```, ```as.double()```, ```as.integer()```, or ```as.logical``` to explicitly coerce values.
 
 Note there are two other types of infrequently used atomic vectors: complex and raw.
 
@@ -78,7 +78,7 @@ x <- list("abc", c(F, F, T), 0:5)
 # creates a list of three vectors, each of a different type of attributes
 ```
 
-A ```c()``` will combine a passed combination of vectors and lists into a single list.
+A ```c()``` will combine a passed combination of vectors and lists into a single list. This is often called "flattening."
 
 ###### Testing and coercion
 
@@ -125,7 +125,7 @@ dataframe <- data.frame(
 ```
 
 ###### Testing
-A data frame is recognized as a list based on it's ```typeof()```, bot as a ```data.frame``` based on it's ```class```. It can also be identified with ```is.data.frame```.
+A data frame is recognized as a list based on it's ```typeof()```, but as a ```data.frame``` based on it's ```class```. It can also be identified with ```is.data.frame```.
 
 ###### Coercion
 Vectors and lists can be coerced into data frames with ```as.data.frame()```. A vector becomes a one column data frame. A list must have elements of equivalent length as they'll each be turned into a var.
@@ -196,7 +196,7 @@ X
 #> [3,]    3    7   11
 #> [4,]    4    8   12
 
-X[1, 1:4]
+X[1, 1:3]
 #> [1] 1 5 9
 
 X[c(1, 5)]
@@ -230,7 +230,7 @@ data[c("v1", "v2")]
 #> 2  2  0
 #> 3  3  0
 
-# Select columns like a matrix; note the result is not a dataframe
+# Select columns like a matrix
 data[, c("v1", "v2")]
 #>   v1 v2
 #> 1  1  0
@@ -316,7 +316,7 @@ There are three parts to each R function:
 
 Each of the above commands can be used to decompose the stated parts of a function.
 
-Recall all R objects, including functions, have ```attributes()``` as well. ```str()``` will identify a function and list its attributes in human-readable text. ```is.function()``` will identify functions with a Boolean
+Recall all R objects, including functions, have ```attributes()``` as well. ```str()``` will identify a function and list its attributes in human-readable text. ```is.function()``` will identify functions with a Boolean.
 
 ### Primitive functions
 Primitive functions are an exception to the rules in R. They rely directly on C code and contain no R code. Therefore, they do not contain the three components noted above. They often provide fundamental computation very efficiently (e.g., ```sum()``` is a primitive that adds). They can be identified with ```is.primitive()```.
@@ -360,7 +360,7 @@ One exception to strict lexical scoping in R is that the program will ignore non
 The function ```exists()``` can be helpful for debugging or building a better intuition about how R is handling scoping.
 
 #### Every Operation is a Function Call
-Every operation is a function call in R. This includes things like ```+```, ```(```, and ```if```. Back ticks, ``` \` ```, allow you to override functions with otherwise protected names (e.g., ```+```), but this is obviously very dangerous.
+Every operation is a function call in R. This includes things like ```+```, ```(```, and ```if```. Back ticks, ``` ` ```, allow you to override functions with otherwise protected names (e.g., ```+```), but this is obviously very dangerous.
 
 ### Function Arguments
 #### Calling Functions
@@ -461,9 +461,9 @@ Environments are where __bindings__ (links between names and values) are stored.
 
 Within R, multiple names can point to the same value (by memory address). Multiple names can also point to different addresses that all store the same value.
 
-If there are no names pointing to an object, it is automatically deleted. That is the memory that was holding it is freed to store new information. The underlying mechanism that drives this is called a "garbage collector." See ```?gc()``` for more information on interacting with this behavior.
+If there are no names pointing to an object, it is automatically deleted. That is to say, the memory that was holding it is freed to store new information. The underlying mechanism that drives this is called a "garbage collector." See ```?gc()``` for more information on interacting with this behavior.
 
-Every environment has a parent. As mentioned in the lexical scoping section, if an R object is not found in an environment, R looks to the parent directory. This search only moves "up" to parent directories. There is no built in way to search "child" directories, and, furthermore, defining which of an arbitrary number of child directories to search wouldn't be straightforward.
+Every environment has a parent. As mentioned in the lexical scoping section, if an R object is not found in an environment, R looks to the parent directory. This search only moves "up" to parent directories. There is no built in way to search "child" directories, and, furthermore, defining which of an arbitrary number of child directories to give priority to wouldn't be straightforward.
 
 There are some basic rules of environments:
 + Each object has a unique name *within* an environment (though the [namespace](https://en.wikipedia.org/wiki/Namespace) allows a name to be used once per environment)
@@ -507,20 +507,16 @@ There are three functions that allow you to handle conditions:
 
 ### Debugging Strategies
 Hadely Wicham gives the following helpful four step approach to debugging:
-1. Realise that you have a bug: this, he suggests, is one of the reasons automated testing is so important
-2. Make it repeatable: isolating exactly what is causing the bug is necessary to hone in on what is failing, so you don't spend time deep diving into superfluous code
-3. Figure out where it is: generate hypotheses, design experiments, test them, and record your results. Being systematic here will save you time in the long run
-4. Fix it and test it: once you've addressed the problem, test to make sure it is actually gone!
++ Realise that you have a bug: this, he suggests, is one of the reasons automated testing is so important
++ Make it repeatable: isolating exactly what is causing the bug is necessary to hone in on what is failing, so you don't spend time deep diving into superfluous code
++ Figure out where it is: generate hypotheses, design experiments, test them, and record your results. Being systematic here will save you time in the long run
++ Fix it and test it: once you've addressed the problem, test to make sure it is actually gone!
 
 Printing intermediate output, ```print()```, is an easy, if crude, tool for troubleshooting code. Print statements allow you to track intermediate output and, therefore, see where execution diverges from what you expect
 
 RStudio also has useful debugging tools built in:
-+ When a function call returns a fatal error, options for "Show Traceback" and "Rerun with Debug" appear on the output window
-..+ ```traceback()``` gives the same output as the button: the order of functions called that led to the error
-..+ the RStudio debugger steps through the function's execution line-by-line, pausing in the execution environment so that you can interact with it along the way
-+ Breakpoints and browsing allow you to arbitrarily pause execution and stay in the executing environment anywhere in your code
-..+ Breakpoints can be added by clicking left of the line number in RStudio, or with ```Shift + F9```
-..+ ```browse()``` statements can be included anywhere in your code for the same effect; note these support conditional statements where breakpoints do not
++ When a function call returns a fatal error, options for "Show Traceback" and "Rerun with Debug" appear on the output window. ```traceback()``` gives the same output as the button: the order of functions called that led to the error. The RStudio debugger steps through the function's execution line-by-line, pausing in the execution environment so that you can interact with it along the way
++ Breakpoints and browsing allow you to arbitrarily pause execution and stay in the executing environment anywhere in your code. Breakpoints can be added by clicking left of the line number in RStudio, or with ```Shift + F9```. ```browse()``` statements can be included anywhere in your code for the same effect; note these support conditional statements where breakpoints do not
 
 For more on debugging in R Studio, see the [documentation](https://support.rstudio.com/hc/en-us/articles/205612627-Debugging-with-RStudio).
 
@@ -537,7 +533,7 @@ The [assertthat](https://github.com/hadley/assertthat) package, ```stop()```, ``
 # Functional Programming
 ## Introduction
 ### Overview and Motivation
-R is a [functional programming](https://en.wikipedia.org/wiki/Functional_programming) language. It allows you to treat functions just like any other object: bind them to names, create lists of them, pass them as arguments in other functions, use them to create other functions (i.e., return them as the result of other functions) etc. The fact that functions are treated like any other data variables means they are [first class functions](https://en.wikipedia.org/wiki/First-class_function).
+R is a [functional programming](https://en.wikipedia.org/wiki/Functional_programming) language. It allows you to treat functions just like any other object: bind them to names, create lists of them, pass them as arguments in other functions, use them to create other functions (i.e., return them as the result of other functions) etc. The fact that functions are treated like any other object means they are [first class functions](https://en.wikipedia.org/wiki/First-class_function).
 
 At a high-level, functional programming is motivated by starting with simple, "primitives," and using these building blocks to create more complex functions. This allows you to concisely define any functionality only once. In R, the building blocks are anonymous functions, closures, and lists of functions. These are discussed in more depth below.
 
@@ -549,19 +545,48 @@ If you don't give an R function a name, you get an anonymous function. These are
 
 Note that calling an anonymous function requires an extra set of parentheses to clearly indicate what exactly you're calling. For example:
 
+```{r}
+# Raise arg1 to arg2 power with anonymous function
+(function(x, y) x^y)(10,6)
+#> [1] 1e+06
+```
+
 ### Closures
 Closures are functions written (returned by) other functions. Their names reference the fact that they're created by a parent function that encloses their environment. Note that by definition closures have access to all of their parent function's variables.
 
-[[example here]]
+```{r}
+divisible <- function(divisor) {
+  function(x) {
+    (x %% divisor == 0)
+  }
+}
+
+DivisibleBy3 <- divisible(3)
+
+DivisibleBy3(99)
+#> [1] TRUE
+DivisibleBy3(100)
+#> [1] FALSE
+```
 
 Unfortunately, printing a closure give the memory address of the enclosing function and not the actual definition (with specified parameters) of itself. This is because the parent function itself isn't actually changing, it just has values passed. You can see this by converting the environment of the closure into a list.
 
-[[example]]
+```{r}
+DivisibleBy3
+#> function(x) {
+#>         (x %% divisor == 0)
+#>     }
+#> <environment: 0x111fccf78>
+
+as.list(environment(DivisibleBy3))
+#> $divisor
+#> [1] 3
+```
 
 As noted earlier, execution environments are forgotten after execution. Functions, however, capture their enclosing environments. This is what allows closures to work. Functionally, it turns out that most R functions are actually closures and thus remember the environment in which they were created. The only exception are primitive functions that are written in C.
 
 ### Lists of Functions
-This is pretty straightforward: you can put function definitions in the elements of a list. The structure is easy to understand, but the power of this may be a bit counterintuitive. Let's look at an example:
+This is pretty straightforward: you can put function definitions in the elements of a list. The structure is easy to understand, but the power of this may be a bit counterintuitive. Let's look at an example benchmarking the run time of an R implementation of summing a vector of numbers vs using the ```sum()``` function. (Because ```sum()``` is a primitive, it is written in C and we'd expect it to be much, much faster than an R implementation.)
 
 ```{r}
 # Benchmarking the processing time of various implementations of a function
@@ -580,12 +605,30 @@ compute_sum <- list(
 y <- runif(1e7) # create ten million reals w/ mean = 0.5; sum ~5e6
 
 system.time(compute_sum$base(y))
+#> user  system elapsed
+#> 0.01    0.00    0.01
+
 system.time(compute_sum[[2]](y))
+#> user  system  elapsed
+#> 4.265  0.030    4.297
 
 # Run each and see if we get the same answer
 lapply(compute_sum, function(f) f(y))
+#> $base
+#> [1] 5000296
+#>
+#> $manual
+#> [1] 5000296
+
 
 # Time each function with one line
 lapply(compute_sum, function(f) system.time(f(y)))
-
+#> $base
+#>    user  system elapsed
+#>    0.01    0.00    0.01
+#>
+#> $manual
+#>    user  system elapsed
+#>   4.157   0.018   4.178
 ```
+Obviously, your exact run times will vary, but the primitive ```sum()``` should run significantly faster.

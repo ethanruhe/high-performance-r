@@ -636,13 +636,13 @@ Obviously, your exact run times will vary, but the primitive ```sum()``` should 
 # Performance
 ## Introduction
 ### Overview
-R is designed to facilitate easy statistical analysis. Unfortunately, facilitating statistical analysis often comes at the expense of fast processing. On balance, R is not a very fast at computation. This is both because priority is often put on ease of implementation and also because a lot of R code is just not terribly efficient. A lot of the R code you'll encounter is written by practicing data analysts (e.g., statisticians, economists, etc.) and not software engineers. Because of this, it is often not optimized for speed. This means that there is often room for significant improvement.
+R is designed to facilitate easy statistical analysis. Unfortunately, facilitating statistical analysis often comes at the expense of fast processing. Relative to many generalized programming languages, R is not very fast at computation. This is both because priority is typically put on ease of implementation and because a lot of R code is just not written with speed in mind. Much of the R code you'll encounter is written by practicing data analysts (e.g., statisticians, economists, etc.) and not software engineers. Because of this, it is optimized for stable statistics. This means that there is frequently room for significant speed improvement.
 
 In this section, we'll try to start building an intuition for why certain things in R are slow, and how you can write more efficient code.
 
 There are three things that make R particularly slow:
 + Dynamism: because just about everything written in R code can later be modified, it is really difficult for an interpreter or compiler to optimize for speed
-+ Name lookup: due to the dynamism of objects and lexical scoping, looking up values in memory addresses associated with values is quite slow in R relative to many other languages. For example, arithmetic operators are defined in the global environment. Depending on where they are called, R might have to search through dozens of environments before finding their definition to be used in execution. Unfortunately, because of the language's structure, caching (i.e., storing frequently used variables in a "closer," more easily accessible structure) is difficult in R
++ Name lookup: due to the dynamism of objects and lexical scoping, looking up values by the memory addresses associated with names is quite slow in R relative to many other languages. For example, arithmetic operators are defined in the global environment. Depending on where they are called, R might have to search through dozens of environments before finding their definition to be used in execution. Unfortunately, because of the language's structure, caching (i.e., storing frequently used variables in a "closer," more easily accessible structure) is difficult in R
 + Lazy evaluation: because of the way R evaluates functions lazily, each additional argument slows down execution, even if it isn't actually used in execution
 
 Hadley Wickham notes that though many of the foundational choices in creating R make it inherently slow, it is still nowhere near its theoretical limit. Unfortunately, the source code is unlikely to be sped up as stability is a much higher priority. There is currently a group of 20 [Core R](https://www.r-project.org/contributors.html) developers. Maintaining and developing the language isn't anyone's primary responsibility, so development doesn't happen particularly quickly.
@@ -666,7 +666,7 @@ microbenchmark(
 #>    x^0.5 37.067700 42.825133 45.611065 44.510281 46.253518 83.45551   100
 ```
 
-Note you saw ```system.time()``` as a benchmarking tool earlier. This is fine for, but ```microbenchmark()``` is much more precise, in part because it automatically runs multiple trials of your code (100 by default).
+Note you saw ```system.time()``` as a benchmarking tool earlier. ```microbenchmark()``` is much more precise, in part because it automatically runs multiple trials of your code (100 by default).
 
 ### Steps for Writing Faster Code
 Writing faster code is a process:
@@ -674,19 +674,21 @@ Writing faster code is a process:
 + Then, try to improve it
 + Repeat the above two steps as necessary
 
-Below is some first steps towards what to look for.
+Below are some first steps towards what to look for.
 
 #### Vectorize
 Functions that use R code to iterate over elements of a multi-element object are quite slow. They extract some particular element of an object, execute R code on it, and then iterate. "Vectorizing" (i.e., executing a C based function on an entire vector) is much faster. Try to find the vectorized function that most closely solves your problem and use it to speed up your code. Useful functions include ```rowSums()```, ```colSums()```, ```rowMeans()```, and ```colMeans()```.
 
+Eventually, you can start writing your own vectorized functions in C++ (see [rcpp](http://www.rcpp.org/)).
+
 #### Avoid Copies
-R code that adds to or appends an object is often functionally creating a new object and copying over each old element plus the new ones to a new memory location, and then forgetting the old memory address. This process is particularly slow, so be careful when using ```c()```, ```append()```, ```cbind()```, ```rbind()```, and ```paste()``` to increase the size of existing objects. Certainly try to avoid iterating over multiple size increases!
+R code that adds to or appends an object is often functionally creating a new object and copying over each old element plus the new ones to a new memory location. This process is particularly slow, so be careful when using ```c()```, ```append()```, ```cbind()```, ```rbind()```, and ```paste()``` to increase the size of existing objects. Certainly try to avoid iterating over multiple size increases!
 
 ## How R Uses memory
 Building some intuition into how R uses memory will help you better identify bottlenecks and write faster code.
 
 ### Object Size
-R has a built in ```object.size()``` function doesn't count shared elements and environment sizes, so try ```pryr::object_size()``` to get more accurate measurements.
+R's built in ```object.size()``` function doesn't count shared elements and environment sizes, so try ```pryr::object_size()``` to get more accurate measurements.
 
 ```{r}
 library(pryr)
@@ -717,7 +719,7 @@ object_size(x, y)
 ```
 
 ### Memory Usage and Garbage Collection
-You can find out the size of all of the objects R is storing in memory with ```pryr::mem_used()```. ```pryr::mem_change()``` will tell you how much additional memory some action would take, or how much it would free up.
+You can find out the size of all of the objects R is storing in memory with ```pryr::mem_used()```. ```pryr::mem_change()``` will tell you how much additional memory some action would use (positive number), or how much it would free up (negative number).
 
 ```{r}
 mem_used()

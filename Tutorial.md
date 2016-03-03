@@ -632,3 +632,103 @@ lapply(compute_sum, function(f) system.time(f(y)))
 #>   4.157   0.018   4.178
 ```
 Obviously, your exact run times will vary, but the primitive ```sum()``` should run significantly faster.
+
+# Performance
+## Introduction
+### Overview
+R is designed to facilitate easy statistical analysis. Unfortunately, facilitating statistical analysis often comes at the expense of fast processing. On balance, R is not a very fast at computation. This is both because priority is often put on ease of implementation and also because a lot of R code is just not terribly efficient. A lot of the R code you'll encounter is written by practicing data analysts (e.g., statisticians, economists, etc.) and not software engineers. Because of this, it is often not optimized for speed. This means that there is often room for significant improvement.
+
+In this section, we'll try to start building an intuition for why certain things in R are slow, and how you can write more efficient code.
+
+There are three things that make R particularly slow:
++ Dynamism: because just about everything written in R code can later be modified, it is really difficult for an interpreter or compiler to optimize for speed
++ Name lookup: due to the dynamism of objects and lexical scoping, looking up values in memory addresses associated with values is quite slow in R relative to many other languages. For example, arithmetic operators are defined in the global environment. Depending on where they are called, R might have to search through dozens of environments before finding their definition to be used in execution. Unfortunately, because of the language's structure, caching (i.e., storing frequently used variables in a "closer," more easily accessible structure) is difficult in R
++ Lazy evaluation: because of the way R evaluates functions lazily, each additional argument slows down execution, even if it isn't actually used in execution
+
+Hadley Wickham notes that though many of the foundational choices in creating R make it inherently slow, it is still nowhere near its theoretical limit. Unfortunately, the source code is unlikely to be sped up as stability is a much higher priority. There is currently a group of 20 [Core R](https://www.r-project.org/contributors.html) developers. Maintaining and developing the language isn't anyone's primary responsibility, so development doesn't happen particularly quickly.
+
+### Measuring Performance
+The [microbenchmark](https://cran.r-project.org/web/packages/microbenchmark) package allows you to precisely measure R run time. It's a great tool for checking the run time of various code snippets and can give you some quick, empirical information about the speed tradeoffs between alternative implementations.
+
+```{r}
+install.packages("microbenchmark")  # run if not yet installed
+library(microbenchmark)
+
+x <- runif(1e6)
+microbenchmark(
+  sqrt(x),
+  x ^ 0.5
+)
+
+#> Unit: milliseconds
+#>     expr       min        lq      mean    median        uq      max neval
+#>  sqrt(x)  4.647449  7.428192  8.119408  7.829737  8.447671 46.30399   100
+#>    x^0.5 37.067700 42.825133 45.611065 44.510281 46.253518 83.45551   100
+```
+
+Note you saw ```system.time()``` as a benchmarking tool earlier. This is fine for, but ```microbenchmark()``` is much more precise, in part because it automatically runs multiple trials of your code (100 by default).
+
+### Steps for Writing Faster Code
+Writing faster code is a process:
++ First, identify what the slowest part of your code is
++ Then, try to improve it
++ Repeat the above two steps as necessary
+
+Below is some first steps towards what to look for.
+
+#### Vectorize
+Functions that use R code to iterate over elements of a multi-element object are quite slow. They extract some particular element of an object, execute R code on it, and then iterate. "Vectorizing" (i.e., executing a C based function on an entire vector) is much faster. Try to find the vectorized function that most closely solves your problem and use it to speed up your code. Useful functions include ```rowSums()```, ```colSums()```, ```rowMeans()```, and ```colMeans()```.
+
+#### Avoid Copies
+R code that adds to or appends an object is often functionally creating a new object and copying over each old element plus the new ones to a new memory location, and then forgetting the old memory address. This process is particularly slow, so be careful when using ```c()```, ```append()```, ```cbind()```, ```rbind()```, and ```paste()``` to increase the size of existing objects. Certainly try to avoid iterating over multiple size increases!
+
+## How R Uses memory
+Building some intuition into how R uses memory will help you better identify bottlenecks and write faster code.
+
+### Object Size
+R has a built in ```object.size()``` function doesn't count shared elements and environment sizes, so try ```pryr::object_size()``` to get more accurate measurements.
+
+```{r}
+library(pryr)
+
+x <- runif(1e6)
+object_size(x)
+#> 8 MB
+
+object_size(rowSums)
+#> 16.8 kB
+
+object_size(sum)
+#> 0 b
+
+y <- x
+object_size(y)
+#> 8 MB
+
+# Passing multiple arguments returns the combined size
+object_size(x, y)
+#> 8 MB
+# Clearly, R doesn't make a copy of x when y is created, y just points to x
+
+x <- runif(1e6)
+object_size(x, y)
+#> 16 MB
+# Assigning a new value to x means that the old value is now only binded to y
+```
+
+### Memory Usage and Garbage Collection
+You can find out the size of all of the objects R is storing in memory with ```pryr::mem_used()```. ```pryr::mem_change()``` will tell you how much additional memory some action would take, or how much it would free up.
+
+```{r}
+mem_used()
+#> 50.4 MB
+
+mem_change(rm(x))
+#> -7.99 MB
+```
+
+R is pretty good about releasing memory once it is no longer needed. The garbage collector automatically releases memory when there are no longer names pointing to an object. There is rarely, if ever, reason to initiate this yourself. That being say, ```gc()``` allows you to do this and the help documentation provides greater detail into how this process works in R.
+
+### Miscellaneous Resources
+Below is a list of useful performance related R articles I'll update as I come across them:
++ [Evaluating the Design of the R Language](http://r.cs.purdue.edu/pub/ecoop12.pdf)

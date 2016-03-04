@@ -9,11 +9,14 @@ I want to learn R because of its broad popularity and deeper extensibility, so I
 I assume the user has already installed R and is using the IDE [RStudio](https://www.rstudio.com/).
 
 #### Note on Data
-To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the brief tutorial. Specifically, I'll be looking at the US Department of Education's College Scorecard data. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
+To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the brief tutorial (in the file ```explore college scorecard data.R``` in this github repo). Specifically, I'll be looking at the US Department of Education's College Scorecard data. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```raw.data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
+
+#### Continued Development
+I intend to add and extend this periodically, both going deeper on current topics and covering more breadth. I expect the examples in the ```.R``` file noted above to expand quickest.
 
 # 1. Fundamentals
 ## Data structures
-There are five data types that are most often used in R analysis. These are either used directly or are the foundations upon which other objects are built. They differ in their dimensionality and whether or not all of their contents must be of the same type (e.g., homogenous vs. heterogeneous).
+There are five data types that are most often used in R analysis. These are either frequently used directly or are the foundations upon which other objects are built. They differ in their dimensionality and whether or not all of their contents must be of the same type (e.g., homogenous vs. heterogeneous). Note that they're all mutable.
 
 |       | Homogeneous   | Heterogeneous|
 | :---: |:-------------:| :-----------:|
@@ -48,7 +51,7 @@ logical_atomic <- (TRUE, T, FALSE, F)
 # Characters
 char_atomic <- c("a", "c")
 ```
-Note assignment is done with ```<-``` and not ```=```. The latter will often work, but the reasons why it breaks can be complicated rules related to compatibility with old versions of S, scope differences in the declaration, or parsing rules. [Here's some short intuition](https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and). To avoid this, it's not a bad idea to default to ```<-``` unless you have a good reason to use ```=```.
+Note assignment is done with ```<-``` and not ```=```. The latter will often work, but the reasons why it breaks can be complicated rules related to compatibility with old versions of S (R's predecessor), scope differences in the declaration, or parsing rules. [Here's some short intuition](https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and). To avoid this, it's not a bad idea to default to ```<-``` unless you have a good reason to use ```=```.
 
 Missing values are specified with the logical vector ```NA``` which will be coerced to the appropriate type if used inside a vector of a different type.
 
@@ -78,7 +81,7 @@ x <- list("abc", c(F, F, T), 0:5)
 # creates a list of three vectors, each of a different type of attributes
 ```
 
-A ```c()``` will combine a passed combination of vectors and lists into a single list. This is often called "flattening."
+A ```c()``` will combine a passed combination of vectors and lists into a single list. This is called "flattening."
 
 ###### Testing and coercion
 
@@ -107,7 +110,6 @@ Functions ```rownames()``` and ```colnames()``` allow you to name rows and colum
 The number of cells in an array can be found with ```length()```. ```nrow()```, and ```ncol()``` give the row and columns counts respectively.
 
 Object's type can be tested with ```is.matrix()``` and ```is.array()```.
-
 
 ###### Coercion
 Using ```as.matrix()``` and ```as.array()``` turn a vector or list into a matrix or array. It's most common to see vectors coerced.
@@ -174,7 +176,6 @@ x[c(TRUE, FALSE)]
 # A missing value in an index always returns an NA in the output
 
 # If a vector is named, index names can be used to subset as well
-
 ```
 
 #### Lists
@@ -236,12 +237,11 @@ data[, c("v1", "v2")]
 #> 1  1  0
 #> 2  2  0
 #> 3  3  0
-
 ```
+
 ### Subsetting Operators
 #### Simplifying vs. preserving subsetting
 Some types of subsetting simplify the output to the most basic type possible, while others preserve the format of the original object. It's important to understand the difference in what you're asking R for.
-
 
 |           | Simplifying      |	Preserving                          |
 |:---------:|:----------------:|:------------------------------------:|
@@ -252,8 +252,7 @@ Some types of subsetting simplify the output to the most basic type possible, wh
 |Data frame	| x[, 1] or x[[1]] | x[, 1, drop = F] or x[1]             |
 
 #### Subsetting with assignment
-Subsetting operators can be used modify selected values of a vector.
-
+Subsetting operators can be used to modify selected values of a vector.
 ```{r}
 x <- 0:9
 x[c(1, 2, 3)] <- 10:12
@@ -274,7 +273,7 @@ For example: ```predict_user_engagement.R```
 Identifiers should either be (a) all lowercase with words separated by dots (```delta.sales```), or (b) camel case (```deltaSales```).
 
 #### Function Names
-The first word of a function name should be a verb. They should also begin with a capital letter with words separated by camel case (```CalibrateBetaBinomial```). Note there shouldn't be any punctuation.
+The first word of a function name should be a verb. It should also begin with a capital letter, and have words separated by camel case (```CalibrateBetaBinomial```). Note there shouldn't be any punctuation.
 
 #### Constants
 Constants should be named like functions, but begin with a ```k``` (```kDiscountRate```).
@@ -301,7 +300,7 @@ Use a consistent ```TODO``` comment system (```TODO(username)```).
 
 Visually break up your code using commented lines of ```-```.
 ```{r}
-# Load data --------------
+# Load data ------------------------------------------
 ```
 
 ## Functions
@@ -351,7 +350,7 @@ var I:integer;
 end.
 ```
 
-Note that the scoping seems hierarchical and vars are only *available* where they are defined or in some sub-part of where they are defined. For example, a var defined in the global environment, the highest level, is available everywhere. But a variable defined within a function is only available to access from inside that function. When looking for the associated value of a named entity, the program will start locally (i.e., the narrowest scope) and keep moving higher until if finds an entity matching that name. This can also be thought of as the effective "order of priority" if there are multiple entities with the same name in a program.
+Note that the scoping seems hierarchical and vars are only *available* where they are defined or in some sub-part of where they are defined. For example, a var defined in the global environment, the highest level, is available everywhere. But a variable defined within a function is only available to access from inside that function. When looking for the associated value of a named entity, R will start locally (i.e., the narrowest scope) and keep moving higher until if finds an entity matching that name. This can also be thought of as the effective "order of priority" if there are multiple entities with the same name in a program.
 
 R looks for values when a function is run, not when it is created. Because of this, if a function relies on a variable outside of its scope (e.g., a global variable), then the result of the function can change as that outside variable changes. This can be dangerous; functions should be self-contained and only be variable depending on values passed as arguments. ```findGlobals()``` identifies global dependencies of a function.
 
@@ -507,7 +506,7 @@ There are three functions that allow you to handle conditions:
 
 ### Debugging Strategies
 Hadely Wicham gives the following helpful four step approach to debugging:
-+ Realise that you have a bug: this, he suggests, is one of the reasons automated testing is so important
++ Realize that you have a bug: this, he suggests, is one of the reasons automated testing is so important
 + Make it repeatable: isolating exactly what is causing the bug is necessary to hone in on what is failing, so you don't spend time deep diving into superfluous code
 + Figure out where it is: generate hypotheses, design experiments, test them, and record your results. Being systematic here will save you time in the long run
 + Fix it and test it: once you've addressed the problem, test to make sure it is actually gone!
@@ -529,7 +528,6 @@ A good way to do this is through tests that verify inputs to functions are as ex
 
 The [assertthat](https://github.com/hadley/assertthat) package, ```stop()```, ```stopifnot()```, and simple ```if``` statements are a great place to start.
 
-
 # Functional Programming
 ## Introduction
 ### Overview and Motivation
@@ -537,11 +535,11 @@ R is a [functional programming](https://en.wikipedia.org/wiki/Functional_program
 
 At a high-level, functional programming is motivated by starting with simple, "primitives," and using these building blocks to create more complex functions. This allows you to concisely define any functionality only once. In R, the building blocks are anonymous functions, closures, and lists of functions. These are discussed in more depth below.
 
-R's ```lapply()``` function is a good example of a function with functional programming in mind. It takes two arguments, (1) a list and (2) a function, plus any arguments that have to be passed to (2). The function in (2) is applied to each element of the list in (2). A new list of the resulting values is returned. The ```lapply()``` allows you to combine the use of any arbitrary input function with the ability to apply it quickly to a queue of inputs. This is the essence of combining useful primitives: "do this to each item of a list" can be disassociated with any particular "doing" to those items.
+R's ```lapply()``` function is a good example of a function with functional programming in mind. It takes two arguments, (1) a list and (2) a function, plus any arguments that have to be passed to (2). The function in (2) is applied to each element of the list in (2). A new list of the resulting values is returned. ```lapply()``` allows you to combine the use of any arbitrary input function with the ability to apply it quickly to a queue of inputs. This is the essence of combining useful primitives: "do this to each item of a list" can be disassociated with any particular "doing" to those items.
 
 ## Basic Building Blocks
 ### Anonymous Functions
-If you don't give an R function a name, you get an anonymous function. These are often useful when it isn't necessary to create a named function that will be used repeated throughout your code. (These are analogous to Python's [lambda functions](https://stackoverflow.com/questions/890128/why-are-python-lambdas-useful)). Since these are actual R functions, they have a ```body()```, a parent ```environment()```, and ```formals()``` as the proceeding sections suggested they would.
+If you don't give an R function a name, you get an anonymous function. These are often useful when it isn't necessary to create a named function that will be used repeated throughout your code. (These are analogous to Python's [lambda functions](https://stackoverflow.com/questions/890128/why-are-python-lambdas-useful)). Since these are actual R functions, they have a ```body()```, a parent ```environment()```, and ```formals()``` as the proceeding sections suggest they would.
 
 Note that calling an anonymous function requires an extra set of parentheses to clearly indicate what exactly you're calling. For example:
 
@@ -569,7 +567,7 @@ DivisibleBy3(100)
 #> [1] FALSE
 ```
 
-Unfortunately, printing a closure give the memory address of the enclosing function and not the actual definition (with specified parameters) of itself. This is because the parent function itself isn't actually changing, it just has values passed. You can see this by converting the environment of the closure into a list.
+Unfortunately, printing a closure gives the memory address of the enclosing function and not the actual definition (with specified parameters) of itself. This is because the parent function itself isn't actually changing, it just has values passed. You can see the passed parameter(s) by converting the environment of the closure into a list.
 
 ```{r}
 DivisibleBy3
@@ -583,7 +581,7 @@ as.list(environment(DivisibleBy3))
 #> [1] 3
 ```
 
-As noted earlier, execution environments are forgotten after execution. Functions, however, capture their enclosing environments. This is what allows closures to work. Functionally, it turns out that most R functions are actually closures and thus remember the environment in which they were created. The only exception are primitive functions that are written in C.
+As noted earlier, execution environments are forgotten after execution. Functions, however, capture their enclosing environments. This is what allows closures to work. In practice, it turns out that most R functions are actually closures and thus remember the environment in which they were created. The only exceptions are primitive functions that are written in C.
 
 ### Lists of Functions
 This is pretty straightforward: you can put function definitions in the elements of a list. The structure is easy to understand, but the power of this may be a bit counterintuitive. Let's look at an example benchmarking the run time of an R implementation of summing a vector of numbers vs using the ```sum()``` function. (Because ```sum()``` is a primitive, it is written in C and we'd expect it to be much, much faster than an R implementation.)
@@ -620,7 +618,6 @@ lapply(compute_sum, function(f) f(y))
 #> $manual
 #> [1] 5000296
 
-
 # Time each function with one line
 lapply(compute_sum, function(f) system.time(f(y)))
 #> $base
@@ -636,7 +633,7 @@ Obviously, your exact run times will vary, but the primitive ```sum()``` should 
 # Performance
 ## Introduction
 ### Overview
-R is designed to facilitate easy statistical analysis. Unfortunately, facilitating statistical analysis often comes at the expense of fast processing. Relative to many generalized programming languages, R is not very fast at computation. This is both because priority is typically put on ease of implementation and because a lot of R code is just not written with speed in mind. Much of the R code you'll encounter is written by practicing data analysts (e.g., statisticians, economists, etc.) and not software engineers. Because of this, it is optimized for stable statistics. This means that there is frequently room for significant speed improvement.
+R is designed to facilitate easy statistical analysis. Unfortunately, facilitating statistical analysis often comes at the expense of fast processing. Relative to many "lower-level," generalized programming languages, R is not very fast at computation. This is both because priority is typically put on ease of implementation and because a lot of R code is just not written with speed in mind. Much of the R code you'll encounter is written by practicing data analysts (e.g., statisticians, economists, etc.) and not software engineers. Because of this, it is optimized for stable statistics. This means that there is frequently room for significant speed improvement.
 
 In this section, we'll try to start building an intuition for why certain things in R are slow, and how you can write more efficient code.
 
@@ -645,7 +642,7 @@ There are three things that make R particularly slow:
 + Name lookup: due to the dynamism of objects and lexical scoping, looking up values by the memory addresses associated with names is quite slow in R relative to many other languages. For example, arithmetic operators are defined in the global environment. Depending on where they are called, R might have to search through dozens of environments before finding their definition to be used in execution. Unfortunately, because of the language's structure, caching (i.e., storing frequently used variables in a "closer," more easily accessible structure) is difficult in R
 + Lazy evaluation: because of the way R evaluates functions lazily, each additional argument slows down execution, even if it isn't actually used in execution
 
-Hadley Wickham notes that though many of the foundational choices in creating R make it inherently slow, it is still nowhere near its theoretical limit. Unfortunately, the source code is unlikely to be sped up as stability is a much higher priority. There is currently a group of 20 [Core R](https://www.r-project.org/contributors.html) developers. Maintaining and developing the language isn't anyone's primary responsibility, so development doesn't happen particularly quickly.
+Hadley Wickham notes that though many of the foundational choices in creating R make it inherently slow, it is still nowhere near its theoretical limit. Unfortunately, the source code is unlikely to be sped up as stability is a much higher priority and there isn't enough dev resources to champion both goals. There is currently a group of 20 [Core R](https://www.r-project.org/contributors.html) developers. Maintaining and developing the language isn't anyone's primary responsibility, so development doesn't happen particularly quickly.
 
 ### Measuring Performance
 The [microbenchmark](https://cran.r-project.org/web/packages/microbenchmark) package allows you to precisely measure R run time. It's a great tool for checking the run time of various code snippets and can give you some quick, empirical information about the speed tradeoffs between alternative implementations.
@@ -729,7 +726,7 @@ mem_change(rm(x))
 #> -7.99 MB
 ```
 
-R is pretty good about releasing memory once it is no longer needed. The garbage collector automatically releases memory when there are no longer names pointing to an object. There is rarely, if ever, reason to initiate this yourself. That being say, ```gc()``` allows you to do this and the help documentation provides greater detail into how this process works in R.
+R is pretty good about releasing memory once it's no longer needed. The garbage collector automatically releases memory when there are no longer names pointing to an object. There is rarely, if ever, reason to initiate this yourself. That being say, ```gc()``` allows you to do this and the help documentation provides greater detail into how this process works in R.
 
 ### Miscellaneous Resources
 Below is a list of useful performance related R articles I'll update as I come across them:

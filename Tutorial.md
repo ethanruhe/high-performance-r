@@ -509,9 +509,9 @@ A <- matrix(
 apply(A, 2, min)
 # [1]  2 1
 ```
-```apply()``` in this example applied the ```mean()``` function to each row of the input matrix A. If we wanted to execute across rows instead of columns, we could have passed ```1``` as the second argument. ```apply()``` expects a matrix or multidimensional object to be passed as the first argument. Avoid using ```apply()``` on data frames, however, as R will first coerce them into a matrix. Instead, look to one of the other functions below.
+```apply()``` in this example applied the ```min()``` function to each row of the input matrix A. If we wanted to execute across rows instead of columns, we could have passed ```1``` as the second argument. ```apply()``` expects a matrix or multidimensional object to be passed as the first argument. Avoid using ```apply()``` on data frames, however, as R will first coerce them into a matrix. Instead, look to one of the other functions below.
 
- The approach of applying functions to entire vectors at a time is called "vectorized" functions. Vectorized functions are frequently the fastest way to calculate in R (see more below in section 3). The ```apply()``` family of functions are greatly preferred to writing loops that iterate over an objects indicies. Below we'll explore other types of ```apply()``` functions.
+ The approach of applying functions to entire vectors at a time is called "vectorized" functions. Vectorized functions are frequently the fastest way to calculate in R (see more below in section 3). The ```apply()``` family of functions are generally preferred to writing loops that iterate over an objects indicies. Below we'll explore other types of ```apply()``` functions.
 
 ```lapply()``` applies a function to each element of a list and returns a list of the resulting values.
 ```{r}
@@ -786,6 +786,8 @@ mem_change(rm(x))
 #> -7.99 MB
 ```
 
+R is really good about releasing memory once it's no longer needed. The garbage collector automatically releases memory when there are no longer names pointing to an object. There is rarely, if ever, reason to initiate this yourself. That being say, ```gc()``` allows you to do this and the help documentation provides greater detail into how this process works in R.
+
 #### Copy-on-modify and Modification in Place
 ```{r}
 a <- 1:10
@@ -796,7 +798,7 @@ a
 ```
 Functionally there are two possible ways R could create the resulting ```a``` vector: it could modify the original object, or it could create a copy of the object and modify that before having the object's name point to the modified copy. Obviously the latter is much, much slower. Depending on the implementation, R can function either way.
 
-If only one name references the value of an object (i.e., points to the memory address of the value), then R will modify an object in place. If multiple names reference the same value, R will copy the object and then modify it (copy-on-modify).
+If only one name references the value of an object (i.e., points to the memory address of the value), then R will modify an object in place. If multiple names reference the same value, R will copy the object and then modify it (sometimes called "copy-on-modify").
 
 The function ```refs()``` (from ```library(pryr)```) will list how many names reference a particular value, although this is only an estimate and not completely reliable.
 ```{r}
@@ -811,8 +813,6 @@ refs(a)
 ```
 
 As a general rule, any non-primitive function run on an object will increase the objects reference count, and thus cause R to create a new copy. Loops in R have a reputation for being slow in large part because their execution often results in one or many copies being created and modified per iteration.
-
-R is pretty good about releasing memory once it's no longer needed. The garbage collector automatically releases memory when there are no longer names pointing to an object. There is rarely, if ever, reason to initiate this yourself. That being say, ```gc()``` allows you to do this and the help documentation provides greater detail into how this process works in R.
 
 ### Miscellaneous Resources
 Below is a list of useful performance related R articles I'll update as I come across them:

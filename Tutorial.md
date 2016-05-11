@@ -9,12 +9,54 @@ I want to learn R because of its broad popularity and deeper extensibility, so I
 I assume the user has already installed R and is using the IDE [RStudio](https://www.rstudio.com/).
 
 #### Note on Data
-To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the brief tutorial (in the file ```explore college scorecard data.R``` in this github repo). Specifically, I'll be looking at the US Department of Education's College Scorecard data. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```raw.data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
+To try to make this a bit more lively, I'll be loading and analyzing real data once I get through the brief tutorial (in the file ```explore_college_scorecard_data.R``` in this github repo). Specifically, I'll be looking at the US Department of Education's College Scorecard data. My hope is that this makes the concepts feel more concrete than purely contrived examples. The full data can be downloaded [here](https://collegescorecard.ed.gov/data/). I'll specifically be working with the 2013 data file ("MERGED2012_PP.csv"). I.e., once downloaded I load ```raw.data <- read.csv("MERGED2013_PP.csv", header=TRUE)```.
 
 #### Continued Development
 I intend to add and extend this periodically, both going deeper on current topics and covering more breadth. I expect the examples in the ```.R``` file noted above to expand quickest.
 
 # 1. Fundamentals
+## Brief Style Guide
+First, it's worth mentioning the Google has a very good [R Style Guide](https://google.github.io/styleguide/Rguide.xml). I generally agree with their suggestions, but have added a few points of emphasis.
+
+### Naming
+#### File Names
+File names should, of course, be descriptive of what the actual file does. The should also end in ```.R```.
+For example: ```predict_user_engagement.R```
+
+#### Variable Names
+Identifiers should either be (a) all lowercase with words separated by dots (```delta.sales```), or (b) camel case (```deltaSales```).
+
+#### Function Names
+The first word of a function name should be a verb. It should also begin with a capital letter, and have words separated by camel case (```CalibrateBetaBinomial```). Note there shouldn't be any punctuation.
+
+#### Constants
+Constants should be named like functions, but begin with a ```k``` (```kDiscountRate```).
+
+### Spacing
+Indent with two spaces, never tabs.
+
+Use spaces around operators (```+, -, >, <-,``` etc.) and parentheses, except in function calls.
+
+### Braces
+An opening curly brace should never go on its own line. A closing curly brace should always be on its own line.
+
+Surround ```else``` statements with curly braces.
+```{r}
+if (condition) {
+  one or more lines
+} else {
+  one or more lines
+}
+```
+
+### Commenting
+Use a consistent ```TODO``` comment system (```TODO(username)```).
+
+Visually break up your code using commented lines of ```-```.
+```{r}
+# Load data ------------------------------------------
+```
+
 ## Data structures
 There are five data types that are most often used in R analysis. These are either frequently used directly or are the foundations upon which other objects are built. They differ in their dimensionality and whether or not all of their contents must be of the same type (e.g., homogenous vs. heterogeneous). Note that they're all mutable.
 
@@ -51,7 +93,7 @@ logical_atomic <- (TRUE, T, FALSE, F)
 # Characters
 char_atomic <- c("a", "c")
 ```
-Note assignment is done with ```<-``` and not ```=```. The latter will often work, but the reasons why it breaks can be complicated rules related to compatibility with old versions of S (R's predecessor), scope differences in the declaration, or parsing rules. [Here's some short intuition](https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and). To avoid this, it's not a bad idea to default to ```<-``` unless you have a good reason to use ```=```.
+Note assignment is done with ```<-``` and not ```=``` throughout this tutorial. The latter will almost always work, but the reasons why it breaks can be complicated rules related to compatibility with old versions of S (R's predecessor), scope differences in the declaration, or parsing rules. [Here's some short intuition](https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and). To avoid this, it's not a bad idea to default to ```<-``` unless you have a good reason to use ```=```.
 
 Missing values are specified with the logical vector ```NA``` which will be coerced to the appropriate type if used inside a vector of a different type.
 
@@ -261,48 +303,6 @@ x
 #> [1] 10 11 12  3  4  5  6  7  8  9
 ```
 
-## Style Guide
-First, it's worth mentioning the Google has a very good [R Style Guide](https://google.github.io/styleguide/Rguide.xml). I generally agree with their suggestions, but have added a few points of emphasis.
-
-### Naming
-#### File Names
-File names should, of course, be descriptive of what the actual file does. The should also end in ```.R```.
-For example: ```predict_user_engagement.R```
-
-#### Variable Names
-Identifiers should either be (a) all lowercase with words separated by dots (```delta.sales```), or (b) camel case (```deltaSales```).
-
-#### Function Names
-The first word of a function name should be a verb. It should also begin with a capital letter, and have words separated by camel case (```CalibrateBetaBinomial```). Note there shouldn't be any punctuation.
-
-#### Constants
-Constants should be named like functions, but begin with a ```k``` (```kDiscountRate```).
-
-### Spacing
-Indent with two spaces, never tabs.
-
-Use spaces around operators (```+, -, >, <-,``` etc.) and parentheses, except in function calls.
-
-### Braces
-An opening curly brace should never go on its own line. A closing curly brace should always be on its own line.
-
-Surround ```else``` statements with curly braces.
-```{r}
-if (condition) {
-  one or more lines
-} else {
-  one or more lines
-}
-```
-
-### Commenting
-Use a consistent ```TODO``` comment system (```TODO(username)```).
-
-Visually break up your code using commented lines of ```-```.
-```{r}
-# Load data ------------------------------------------
-```
-
 ## Functions
 Functions allow you to write reusable code to be applied in a potentially flexible way on a variety of inputs. Functions are a key building block of R. Importantly, they are objects themselves and can be treated as such.
 
@@ -321,38 +321,48 @@ Recall all R objects, including functions, have ```attributes()``` as well. ```s
 Primitive functions are an exception to the rules in R. They rely directly on C code and contain no R code. Therefore, they do not contain the three components noted above. They often provide fundamental computation very efficiently (e.g., ```sum()``` is a primitive that adds). They can be identified with ```is.primitive()```.
 
 ### Lexical Scoping
-[Scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)) is the set of rules that govern how a computer program looks up entities, such as variables, when they're referenced in code.
+[Scoping](https://en.wikipedia.org/wiki/Scope_(computer_science)) is the set of rules that govern how a computer program looks up values, such as variables, when they're referenced by name. Scoping is tightly related to the discussion of environments (below), but we'll discuss it here because it's crucial for writing functions.
 
 Note: when using R's command line interactively, it uses "dynamic scoping." This has it's own rules and issues, but we won't cover them here because the topic is outside the... scope of this tutorial.
 
-With lexical scoping, availability and access to entities by name is determined by where they are created relative to other entities.
+With lexical scoping, access to objects (by referencing their names) is determined by where objects are *created* relative to other entities, not by where they're called. Therefore, to know where the value of a function's variable will be looked up, you need to look at its function definition. The following examples demonstrate this principle.
 
-To steal from the Wiki example of a different programing language:
-```
-program A;
-var I:integer;
-    K:char;
-
-    procedure B;
-    var K:real;
-        L:integer;
-
-        procedure C;
-        var M:real;
-        begin
-         (*scope A+B+C*)
-        end;
-
-     (*scope A+B*)
-    end;
-
- (*scope A*)
-end.
+```{r}
+a <- 1
+f <- function() {
+  b <- 2
+  c(a, b)
+}
+f()
+# 1 2
 ```
 
-Note that the scoping seems hierarchical and vars are only *available* where they are defined or in some sub-part of where they are defined. For example, a var defined in the global environment, the highest level, is available everywhere. But a variable defined within a function is only available to access from inside that function. When looking for the associated value of a named entity, R will start locally (i.e., the narrowest scope) and keep moving higher until if finds an entity matching that name. This can also be thought of as the effective "order of priority" if there are multiple entities with the same name in a program.
+Because of where the function ```f()``` is created, R first looks for it inside the function's definition. If it can't find it there, it looks in the environment in which that function was defined. In the next example, the value of ```a``` is changed in the environment that ```f()``` will look for its definition, so running ```f()``` yields the updated value.
+```{r}
+a <- 10
+f()
+# 10 2
+```
 
-R looks for values when a function is run, not when it is created. Because of this, if a function relies on a variable outside of its scope (e.g., a global variable), then the result of the function can change as that outside variable changes. This can be dangerous; functions should be self-contained and only be variable depending on values passed as arguments. ```findGlobals()``` identifies global dependencies of a function.
+Clearly, if a function relies on a variable outside of its definition, then the result of the function can change as that outside variable changes. This can be very dangerous; functions should be self-contained and only be variable depending on values passed as arguments. ```findGlobals()``` identifies global dependencies of a function.
+
+For one last example, look at the following closure definition. (A closure is just a function that results in another function. They are covered in greater detail below.)
+```{r}
+g <- function(a) {
+  b <- 2
+  function() {
+    c(a, b)
+  }
+}
+h <- g(1)
+h()
+# 1 2
+
+b <- 10
+h()
+# 1 2
+```
+Because ```h()``` preserves the environment in which it was defined, and ```b``` is defined there, the value comes along with the new function.
 
 One exception to strict lexical scoping in R is that the program will ignore non-function objects with a shared name if the object being called is clearly a function.
 
@@ -454,6 +464,75 @@ Functions are only able to return one object, so if you want multiple values bac
 
 It is also worth being aware that other than return values, functions generally have no other side effects. That is, they won't modify anything outside their scope. There are a few exceptions to this, but these are functions whose sole purpose is to modify the environment (e.g., ```setwd()```) or do something like write to disk (e.g., ```save.csv()```).
 
+### Closures
+Closures are functions written (returned by) other functions. Their names reference the fact that they're created by a parent function that encloses their environment. Note that by definition closures have access to all of their parent function's variables.
+
+```{r}
+divisible <- function(divisor) {
+  function(x) {
+    (x %% divisor == 0)
+  }
+}
+
+DivisibleBy3 <- divisible(3)
+
+DivisibleBy3(99)
+#> [1] TRUE
+DivisibleBy3(100)
+#> [1] FALSE
+```
+
+Unfortunately, printing a closure gives the memory address of the enclosing function and not the actual definition (with specified parameters) of itself. This is because the parent function itself isn't actually changing, it just has values passed. You can see the passed parameter(s) by converting the environment of the closure into a list.
+
+```{r}
+DivisibleBy3
+#> function(x) {
+#>         (x %% divisor == 0)
+#>     }
+#> <environment: 0x111fccf78>
+
+as.list(environment(DivisibleBy3))
+#> $divisor
+#> [1] 3
+```
+
+As noted earlier, execution environments are forgotten after execution. Functions, however, capture their enclosing environments. This is what allows closures to work. In practice, it turns out that most R functions are actually closures and thus remember the environment in which they were created. The only exceptions are primitive functions that are written in C.
+
+## R's Built-in Apply Functions
+The ```apply()``` family of functions in R are built to allow you to execute a function over a vector on inputs. For example:
+```{r}
+A <- matrix(
+  c(4, 2, 8, 34, 1, 6),
+  nrow = 3, ncol =2)
+)
+
+apply(A, 2, min)
+# [1]  2 1
+```
+```apply()``` in this example applied the ```mean()``` function to each row of the input matrix A. If we wanted to execute across rows instead of columns, we could have passed ```1``` as the second argument. ```apply()``` expects a matrix or multidimensional object to be passed as the first argument. Avoid using ```apply()``` on data frames, however, as R will first coerce them into a matrix. Instead, look to one of the other functions below.
+
+ The approach of applying functions to entire vectors at a time is called "vectorized" functions. Vectorized functions are frequently the fastest way to calculate in R (see more below in section 3). The ```apply()``` family of functions are greatly preferred to writing loops that iterate over an objects indicies. Below we'll explore other types of ```apply()``` functions.
+
+```lapply()``` applies a function to each element of a list and returns a list of the resulting values.
+```{r}
+x <- list(a = 'a', b = 1:10, c = 10:100)
+
+lapply(x, length)
+#$a
+#[1] 1
+#
+#$b
+#[1] 10
+#
+#$c
+#[1] 91
+```
+
+```sapply()``` applies a function to each element of a list and returns either a vector, or the data type it guesses you might want back. For example ```sapply(1:10,function(x) rnorm(3,x))``` would return a matrix. So, be careful when using ```sapply()``` because it can be great for working quickly in the command line, but may yield unexpected results in production code. (See ```vapply()``` for a similar function that allows you specify exactly what type of object is returned.)
+
+There are several other types of functions in this family that you might find useful: ```tapply()``` applies a function to subsets of a vector where the subsets are defined by some other vector. ```rapply()``` applies a function to each element of a nested list. ```mapply()``` applies a function index-by-index across multiple types of objects and returns a vector.
+
+
 ## Environments
 ### Overview
 Environments are where __bindings__ (links between names and values) are stored. Each name points to a value stored somewhere in memory (e.g., a physical byte address). The addresses are associated with names, so that when you invoke an object, R knows where to go retrieve its value. Environments are data structures that organize scoping and bindings.
@@ -462,7 +541,7 @@ Within R, multiple names can point to the same value (by memory address). Multip
 
 If there are no names pointing to an object, it is automatically deleted. That is to say, the memory that was holding it is freed to store new information. The underlying mechanism that drives this is called a "garbage collector." See ```?gc()``` for more information on interacting with this behavior.
 
-Every environment has a parent. As mentioned in the lexical scoping section, if an R object is not found in an environment, R looks to the parent directory. This search only moves "up" to parent directories. There is no built in way to search "child" directories, and, furthermore, defining which of an arbitrary number of child directories to give priority to wouldn't be straightforward.
+Every environment in R (except one) has a parent. When you call a function, R will start in the current environment to look for that function's definition. If it doesn't find the definition in the current environment, the search will continue in the current environment's parent, and so on. This search only moves "up" to parent directories. There is no built in way to search "child" directories, and, furthermore, defining which of an arbitrary number of child directories to give priority to wouldn't be straightforward.
 
 There are some basic rules of environments:
 + Each object has a unique name *within* an environment (though the [namespace](https://en.wikipedia.org/wiki/Namespace) allows a name to be used once per environment)
@@ -489,6 +568,28 @@ Specifically, there are four types of environments associated with functions:
 + binding: associates the contents of a function with a name via ```<-```
 + execution: the environment that exists only while a function is being evaluated (and is then destroyed)
 + calling: the environment from which a function was invoked
+
+### Accessing a Parent Environment with <<-
+The ```<<-``` operator allows variables within an environment's parent to be manipulated while otherwise maintaining the same "state." This is most useful in functionals. For example:
+```{r}
+new_counter <- function() {
+  i <- 0
+  function() {
+    # do something useful, then ...
+    i <<- i + 1
+    i
+  }
+}
+
+counter_one <- new_counter()
+counter_two <- new_counter()
+
+counter_one() # -> [1] 1
+counter_one() # -> [1] 2
+counter_two() # -> [1] 1
+```
+Here a child function is able to iterate ```i``` in the parent environment using ```<<-```, effectively creating a count of how many times each child function has been called.
+([See Hadley Wickham's stackoverflow answer here for more detail on this example.](https://stackoverflow.com/questions/2628621/how-do-you-use-scoping-assignment-in-r/2630222#2630222))
 
 ## Debugging
 No matter how advanced of an R coder you become, much of your time is going to be spent investigating and fixing unanticipated errors. This section will give a high-level foundation of how to quickly troubleshoot bugs in your code. Additionally, it will highlight a few tools for communicating expected problems to a user.
@@ -548,40 +649,6 @@ Note that calling an anonymous function requires an extra set of parentheses to 
 (function(x, y) x^y)(10,6)
 #> [1] 1e+06
 ```
-
-### Closures
-Closures are functions written (returned by) other functions. Their names reference the fact that they're created by a parent function that encloses their environment. Note that by definition closures have access to all of their parent function's variables.
-
-```{r}
-divisible <- function(divisor) {
-  function(x) {
-    (x %% divisor == 0)
-  }
-}
-
-DivisibleBy3 <- divisible(3)
-
-DivisibleBy3(99)
-#> [1] TRUE
-DivisibleBy3(100)
-#> [1] FALSE
-```
-
-Unfortunately, printing a closure gives the memory address of the enclosing function and not the actual definition (with specified parameters) of itself. This is because the parent function itself isn't actually changing, it just has values passed. You can see the passed parameter(s) by converting the environment of the closure into a list.
-
-```{r}
-DivisibleBy3
-#> function(x) {
-#>         (x %% divisor == 0)
-#>     }
-#> <environment: 0x111fccf78>
-
-as.list(environment(DivisibleBy3))
-#> $divisor
-#> [1] 3
-```
-
-As noted earlier, execution environments are forgotten after execution. Functions, however, capture their enclosing environments. This is what allows closures to work. In practice, it turns out that most R functions are actually closures and thus remember the environment in which they were created. The only exceptions are primitive functions that are written in C.
 
 ### Lists of Functions
 This is pretty straightforward: you can put function definitions in the elements of a list. The structure is easy to understand, but the power of this may be a bit counterintuitive. Let's look at an example benchmarking the run time of an R implementation of summing a vector of numbers vs using the ```sum()``` function. (Because ```sum()``` is a primitive, it is written in C and we'd expect it to be much, much faster than an R implementation.)
@@ -666,15 +733,8 @@ microbenchmark(
 Note you saw ```system.time()``` as a benchmarking tool earlier. ```microbenchmark()``` is much more precise, in part because it automatically runs multiple trials of your code (100 by default).
 
 ### Steps for Writing Faster Code
-Writing faster code is a process:
-+ First, identify what the slowest part of your code is
-+ Then, try to improve it
-+ Repeat the above two steps as necessary
-
-Below are some first steps towards what to look for.
-
 #### Vectorize
-Functions that use R code to iterate over elements of a multi-element object are quite slow. They extract some particular element of an object, execute R code on it, and then iterate. "Vectorizing" (i.e., executing a C based function on an entire vector) is much faster. Try to find the vectorized function that most closely solves your problem and use it to speed up your code. Useful functions include ```rowSums()```, ```colSums()```, ```rowMeans()```, and ```colMeans()```.
+Functions that use R code to iterate over elements of a multi-element object are quite slow. They extract some particular element of an object, execute R code on it, and then iterate. "Vectorizing" (i.e., executing a C based function on an entire vector) is much faster. Try to find the vectorized function that most closely solves your problem and use it to speed up your code (like the ```apply()``` family of functions mentioned above). Useful functions include ```rowSums()```, ```colSums()```, ```rowMeans()```, and ```colMeans()```.
 
 Eventually, you can start writing your own vectorized functions in C++ (see [rcpp](http://www.rcpp.org/)).
 
